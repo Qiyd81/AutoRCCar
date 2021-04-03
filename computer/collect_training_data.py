@@ -22,7 +22,8 @@ class CollectTrainingData(object):
         self.connection = self.server_socket.accept()[0].makefile('rb')
 
         # connect to a seral port
-        self.ser = serial.Serial(serial_port, 115200, timeout=1)
+        #self.ser = serial.Serial(serial_port, 115200, timeout=1)
+        self.ser = serial.Serial(serial_port, 9600, timeout=1)
         self.send_inst = True
 
         self.input_size = input_size
@@ -65,11 +66,13 @@ class CollectTrainingData(object):
                     # select lower half of the image
                     height, width = image.shape
                     roi = image[int(height/2):height, :]
+                    #roi = image[0:height, :]
 
                     cv2.imshow('image', image)
 
                     # reshape the roi image into a vector
                     temp_array = roi.reshape(1, int(height/2) * width).astype(np.float32)
+                    #temp_array = roi.reshape(1, height * width).astype(np.float32)
                     
                     frame += 1
                     total_frame += 1
@@ -168,11 +171,13 @@ class CollectTrainingData(object):
 
 if __name__ == '__main__':
     # host, port
-    h, p = "192.168.1.100", 8000
+    h, p = "192.168.43.85", 8000
 
     # serial port
-    sp = "/dev/tty.usbmodem1421"
-
+    #sp = "/dev/tty.usbmodem1421"
+    #sp = "/dev/cu.usbserial-1410"
+	#sp = "/dev/cu.HC-06-SPPDev"
+    sp = "/dev/cu.usbserial-01E77144"
     # vector size, half of the image
     s = 120 * 320
 

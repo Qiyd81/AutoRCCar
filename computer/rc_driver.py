@@ -39,7 +39,8 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
     nn.load_model("saved_model/nn_model.xml")
 
     obj_detection = ObjectDetection()
-    rc_car = RCControl("/dev/tty.usbmodem1421") 
+    #rc_car = RCControl("/dev/tty.usbmodem1421")
+    rc_car = RCControl("/dev/cu.usbserial-01E77144")
 
     # cascade classifiers
     stop_cascade = cv2.CascadeClassifier("cascade_xml/stop_sign.xml")
@@ -102,9 +103,22 @@ class VideoStreamHandler(socketserver.StreamRequestHandler):
 
                     # stop conditions
                     if sensor_data and int(sensor_data) < self.d_sensor_thresh:
-                        print("Stop, obstacle in front")
+                        print("Stop, obstacle in front, sensor_data=", sensor_data)
                         self.rc_car.stop()
-                        sensor_data = None
+                        #sensor_data = None
+                        # stop for 5 seconds
+                        if stop_flag is False:
+                            self.stop_start = cv2.getTickCount()
+                            stop_flag = True
+                        self.stop_finish = cv2.getTickCount()
+
+                        self.stop_time = (self.stop_finish - self.stop_start) / cv2.getTickFrequency()
+                        print("Stop time: %.2fs" % self.stop_time)
+
+                        # 5 seconds later, continue driving
+                        if self.stop_time > 5:
+                            print("Waited for 5 seconds, turn right")
+                            self.rc_car.steer(1)                      
 
                     elif 0 < self.d_stop_sign < self.d_stop_light_thresh and stop_sign_active:
                         print("Stop sign ahead")
@@ -183,7 +197,7 @@ class Server(object):
 
 
 if __name__ == '__main__':
-    h, p1, p2 = "192.168.1.100", 8000, 8002
+    h, p1, p2 = "192.168.43.85", 8000, 8002
 
     ts = Server(h, p1, p2)
     ts.start()

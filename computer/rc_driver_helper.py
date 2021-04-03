@@ -8,23 +8,23 @@ import math
 class RCControl(object):
 
     def __init__(self, serial_port):
-        self.serial_port = serial.Serial(serial_port, 115200, timeout=1)
+        self.serial_port = serial.Serial(serial_port, 9600, timeout=1)
 
     def steer(self, prediction):
         if prediction == 2:
-            self.serial_port.write(chr(1).encode())
+            self.serial_port.write(chr(1).encode("utf-8"))
             print("Forward")
         elif prediction == 0:
-            self.serial_port.write(chr(7).encode())
+            self.serial_port.write(chr(4).encode("utf-8"))
             print("Left")
         elif prediction == 1:
-            self.serial_port.write(chr(6).encode())
+            self.serial_port.write(chr(3).encode("utf-8"))
             print("Right")
         else:
             self.stop()
 
     def stop(self):
-        self.serial_port.write(chr(0).encode())
+        self.serial_port.write(chr(0).encode("utf-8"))
 
 
 class DistanceToCamera(object):
@@ -32,8 +32,10 @@ class DistanceToCamera(object):
     def __init__(self):
         # camera params
         self.alpha = 8.0 * math.pi / 180    # degree measured manually
-        self.v0 = 119.865631204             # from camera matrix
-        self.ay = 332.262498472             # from camera matrix
+#        self.v0 = 119.865631204             # from camera matrix
+#        self.ay = 332.262498472             # from camera matrix
+        self.v0 = 953.2111695884029
+        self.ay = 2265.1808706050774
 
     def calculate(self, v, h, x_shift, image):
         # compute and return the distance from the target point to the camera
