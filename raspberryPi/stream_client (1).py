@@ -17,6 +17,8 @@ try:
         camera.framerate = 15               # 15 frames/sec
         time.sleep(2)                       # give 2 secs for camera to initilize
         start = time.time()
+        camera.vflip = True
+        camera.hflip = True
         stream = io.BytesIO()
         
         # send jpeg format video stream
